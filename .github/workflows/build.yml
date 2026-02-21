@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [22.x, 24.x]
+        node-version: [22.x, 24.x, 25.x]
       fail-fast: false
 
     steps:
@@ -79,4 +79,54 @@ jobs:
         path: |
           build/**/*.log
           npm-debug.log*
+        if-no-files-found: ignore
+
+  bun-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Cache CMake build
+      uses: actions/cache@v4
+      with:
+        path: |
+          build
+          ~/.cmake
+        key: ${{ runner.os }}-cmake-bun-${{ hashFiles('CMakeLists.txt', 'abieos/**') }}
+        restore-keys: |
+          ${{ runner.os }}-cmake-bun-
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+
+    # Bun needs Node.js for cmake-js (node-gyp dependency)
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24.x
+
+    - name: Install dependencies
+      run: bun install
+
+    - name: Build Linux native module
+      run: bun run build:linux
+
+    - name: Build TypeScript
+      run: bun run build
+
+    - name: Run tests
+      run: bun run test
+
+    # Upload build artifacts on failure for debugging
+    - name: Upload build logs on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-logs-bun
+        path: |
+          build/**/*.log
         if-no-files-found: ignore

@@ -12,6 +12,7 @@ src
 CMakeLists.txt
 
 bun.lockb
+bun.lock
 tsconfig.json
 tsup.config.ts
 

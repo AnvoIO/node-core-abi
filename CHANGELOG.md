@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) where possible.
 
+## [4.1.0-f7d5b45] - 2026-02-21
+
+> The `-f7d5b45` suffix denotes the upstream `AntelopeIO/abieos` commit hash bundled with this release.
+
+### Changed
+- Switched abieos submodule origin from `igorls/abieos` fork to official [`AntelopeIO/abieos`](https://github.com/AntelopeIO/abieos). The fork's `abieos_delete_contract` was merged upstream in [PR #27](https://github.com/AntelopeIO/abieos/pull/27), so the fork is no longer needed.
+- **`cmake-js`** 7.3.1 → 8.0.0 (major — build validated, no CMake changes required).
+- **`c8`** 9.1.0 → 10.1.3 (major — coverage tool upgrade).
+- **`@microsoft/api-extractor`** 7.52.13 → 7.57.2.
+- **`@types/node`** 24.6.0 → 25.3.0.
+- **`tsup`** 8.5.0 → 8.5.1.
+- **`typescript`** 5.9.2 → 5.9.3.
+
+---
+
 ## [4.0.3-f7d5b45] - 2025-09-29
 
 > The `-f7d5b45` suffix denotes the upstream `AntelopeIO/abieos` commit hash bundled with this release.

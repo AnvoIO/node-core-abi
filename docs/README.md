@@ -1,15 +1,15 @@
-# node-abieos Documentation
+# node-core-abi Documentation
 
 ## Overview
 
-`node-abieos` is a Node.js native binding for [abieos](https://github.com/AntelopeIO/abieos), providing binary to JSON conversion using ABIs. This documentation provides detailed information on installation, usage, API reference, error handling, debugging, and examples.
+`node-core-abi` is a Node.js native binding for [coreAbi](https://github.com/AnvoIO/core-abi), providing binary to JSON conversion using ABIs. This documentation provides detailed information on installation, usage, API reference, error handling, debugging, and examples.
 
 ## Installation
 
-To install `node-abieos`, use the following command:
+To install `node-core-abi`, use the following command:
 
 ```shell
-npm i @eosrio/node-abieos --save
+npm i @anvoio/node-core-abi --save
 ```
 
 ## Usage
@@ -17,25 +17,25 @@ npm i @eosrio/node-abieos --save
 ### CommonJS
 
 ```js
-const nodeAbieos = require('@eosrio/node-abieos');
+const nodeCoreAbi = require('@anvoio/node-core-abi');
 ```
 
 ### ES Modules
 
 ```typescript
-import { Abieos } from "@eosrio/node-abieos";
-const abieos = Abieos.getInstance();
+import { CoreAbi } from "@anvoio/node-core-abi";
+const coreAbi = CoreAbi.getInstance();
 ```
 
 ## API Reference
 
-### Abieos Class
+### CoreAbi Class
 
-The `Abieos` class provides a singleton instance for interacting with the native abieos module. This pattern ensures a single global context for the underlying C++ abieos library, which manages internal state and resources.
+The `CoreAbi` class provides a singleton instance for interacting with the native coreAbi module. This pattern ensures a single global context for the underlying C++ coreAbi library, which manages internal state and resources.
 
 #### Methods
 
-- **getInstance()**: Returns the singleton instance of the `Abieos` class.
+- **getInstance()**: Returns the singleton instance of the `CoreAbi` class.
 - **getLoadedAbis()**: Returns an array of loaded ABI contract names.
 - **cleanup()**: Cleans up all loaded contracts by deleting them from the native context.
 - **stringToName(nameString: string)**: Converts a string name to its corresponding 64-bit unsigned integer representation (BigInt).
@@ -46,18 +46,18 @@ The `Abieos` class provides a singleton instance for interacting with the native
 - **loadAbiHex(contractName: string, abihex: string)**: Loads an ABI for a given contract from its hexadecimal representation.
 - **getTypeForAction(contractName: string, actionName: string)**: Retrieves the type name for a specific action within a contract's ABI.
 - **getTypeForTable(contractName: string, table_name: string)**: Retrieves the type name for a specific table within a contract's ABI.
-- **deleteContract(contractName: string)**: Deletes a contract's ABI from the abieos context.
+- **deleteContract(contractName: string)**: Deletes a contract's ABI from the coreAbi context.
 
 ## Error Handling
 
-Errors in `node-abieos` are thrown as JavaScript exceptions. Each method that interacts with the native abieos module includes error handling to provide meaningful error messages.
+Errors in `node-core-abi` are thrown as JavaScript exceptions. Each method that interacts with the native coreAbi module includes error handling to provide meaningful error messages.
 
 ## Debugging
 
-To enable debugging, set the `Abieos.debug` property to `true`. This will log additional information to the console.
+To enable debugging, set the `CoreAbi.debug` property to `true`. This will log additional information to the console.
 
 ```typescript
-Abieos.debug = true;
+CoreAbi.debug = true;
 ```
 
 ## Examples
@@ -65,8 +65,8 @@ Abieos.debug = true;
 ### Basic Example
 
 ```typescript
-import { Abieos } from "@eosrio/node-abieos";
-const abieos = Abieos.getInstance();
+import { CoreAbi } from "@anvoio/node-core-abi";
+const coreAbi = CoreAbi.getInstance();
 
 const abi = {
     "version": "eosio::abi/1.1",
@@ -91,7 +91,7 @@ const abi = {
     ]
 };
 
-abieos.loadAbi("eosio.token", abi);
+coreAbi.loadAbi("eosio.token", abi);
 
 const json = {
     from: "alice",
@@ -100,18 +100,18 @@ const json = {
     memo: "Test transfer"
 };
 
-const hex = abieos.jsonToHex("eosio.token", "transfer", json);
+const hex = coreAbi.jsonToHex("eosio.token", "transfer", json);
 console.log("Hex:", hex);
 
-const parsedJson = abieos.hexToJson("eosio.token", "transfer", hex);
+const parsedJson = coreAbi.hexToJson("eosio.token", "transfer", hex);
 console.log("Parsed JSON:", parsedJson);
 ```
 
-Check the [/examples](https://github.com/eosrio/node-abieos/tree/master/examples) folder for more implementation examples.
+Check the [/examples](https://github.com/AnvoIO/node-core-abi/tree/master/examples) folder for more implementation examples.
 
 ## Build Process and Dependencies
 
-Make sure you have Clang installed on your system. We recommend using Clang 18 to build the `abieos` C++ library.
+Make sure you have Clang installed on your system. We recommend using Clang 18 to build the `coreAbi` C++ library.
 
 ```bash
 wget https://apt.llvm.org/llvm.sh
@@ -122,8 +122,8 @@ sudo ./llvm.sh 18
 Clone and Build
 
 ```shell
-git clone https://github.com/eosrio/node-abieos.git --recursive
-cd node-abieos
+git clone https://github.com/AnvoIO/node-core-abi.git --recursive
+cd node-core-abi
 npm install
 npm run build:linux
 npm run build

@@ -2,7 +2,7 @@ examples
 build
 include
 tools
-abieos
+core-abi
 test
 scripts
 lib

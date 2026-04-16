@@ -1,6 +1,6 @@
-import {Abieos} from "../lib/abieos.js";
+import {CoreAbi} from "../lib/coreAbi.js";
 
-const abieos = Abieos.getInstance();
+const coreAbi = CoreAbi.getInstance();
 
 const abi = `
 {
@@ -38,21 +38,21 @@ const abi = `
 }
 `;
 
-const status = abieos.loadAbi("1", abi);
+const status = coreAbi.loadAbi("1", abi);
 console.log(status);
 
-const hex = abieos.jsonToHex("1", "foo", {
+const hex = coreAbi.jsonToHex("1", "foo", {
     things: ["uint8", 4]
 });
 console.log(hex);
 
-const hex2 = abieos.jsonToHex("1", "foo", {
+const hex2 = coreAbi.jsonToHex("1", "foo", {
     things: ["bar", {baz: "moo"}]
 });
 console.log(hex2);
 
-const data = abieos.hexToJson("1", "foo", hex);
+const data = coreAbi.hexToJson("1", "foo", hex);
 console.log(data);
 
-const data2 = abieos.hexToJson("1", "foo", hex2);
+const data2 = coreAbi.hexToJson("1", "foo", hex2);
 console.log(data2);

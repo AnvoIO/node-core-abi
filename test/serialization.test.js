@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { Abieos } from '../dist/abieos.js';
+import { CoreAbi } from '../dist/core-abi.js';
 import { assertThrows } from './utils/test-helpers.js';
 
 test.describe('Serialization (jsonToHex)', () => {
-    const abieos = Abieos.getInstance();
+    const coreAbi = CoreAbi.getInstance();
 
     const contractAccount = "test.token";
     const transferABI = {
@@ -23,9 +23,9 @@ test.describe('Serialization (jsonToHex)', () => {
         actions: [{ name: "transfer", type: "transfer", ricardian_contract: "" }],
     };
 
-    Abieos.debug = true;
-    abieos.cleanup();
-    abieos.loadAbi(contractAccount, transferABI);
+    CoreAbi.debug = true;
+    coreAbi.cleanup();
+    coreAbi.loadAbi(contractAccount, transferABI);
 
 
     test('should serialize valid transfer action data', () => {
@@ -35,7 +35,7 @@ test.describe('Serialization (jsonToHex)', () => {
             quantity: "1.0000 EOS",
             memo: "test transfer"
         };
-        const hex = abieos.jsonToHex(contractAccount, "transfer", actionData);
+        const hex = coreAbi.jsonToHex(contractAccount, "transfer", actionData);
         assert.ok(typeof hex === 'string' && hex.length > 0, 'Should return a non-empty hex string');
     });
 
@@ -43,7 +43,7 @@ test.describe('Serialization (jsonToHex)', () => {
         const actionData = { from: "a", to: "b", quantity: "1.0 EOS", memo: "m" };
         assertThrows(
             /is not loaded/i,
-            () => abieos.jsonToHex("unknown", "transfer", actionData),
+            () => coreAbi.jsonToHex("unknown", "transfer", actionData),
             'Should throw if ABI is not loaded'
         );
     });
@@ -52,7 +52,7 @@ test.describe('Serialization (jsonToHex)', () => {
         const actionData = { from: "a", to: "b", quantity: "1.0 EOS", memo: "m" };
         assertThrows(
             /Unknown type/i,
-            () => abieos.jsonToHex(contractAccount, "unknown_type", actionData),
+            () => coreAbi.jsonToHex(contractAccount, "unknown_type", actionData),
             'Should throw if type is not found'
         );
     });
@@ -65,7 +65,7 @@ test.describe('Serialization (jsonToHex)', () => {
         };
         assertThrows(
             /Expected field/i,
-            () => abieos.jsonToHex(contractAccount, "transfer", actionData),
+            () => coreAbi.jsonToHex(contractAccount, "transfer", actionData),
             'Should throw for missing required fields'
         );
     });
@@ -79,7 +79,7 @@ test.describe('Serialization (jsonToHex)', () => {
         };
         assertThrows(
             /Expected symbol code/i,
-            () => abieos.jsonToHex(contractAccount, "transfer", actionData),
+            () => coreAbi.jsonToHex(contractAccount, "transfer", actionData),
             'Should throw for incorrect data types'
         );
     });

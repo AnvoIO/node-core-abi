@@ -1,16 +1,16 @@
 import { createRequire } from "node:module";
-const abieos = createRequire(import.meta.url)('./abieos.node');
+const coreAbi = createRequire(import.meta.url)('./core-abi.node');
 
 /**
- * Abieos class provides a singleton instance for interacting with the native abieos module.
- * This pattern is used to ensure a single global context for the underlying C++ abieos library,
+ * CoreAbi class provides a singleton instance for interacting with the native coreAbi module.
+ * This pattern is used to ensure a single global context for the underlying C++ coreAbi library,
  * which manages internal state and resources.
  */
-export class Abieos {
+export class CoreAbi {
 
-    public static logTag: string = '[node-abieos]';
-    private static instance: Abieos;
-    public static native: typeof abieos;
+    public static logTag: string = '[node-core-abi]';
+    private static instance: CoreAbi;
+    public static native: typeof coreAbi;
     private static loadedContracts: Map<string, number> = new Map();
     public static debug: boolean = false;
 
@@ -19,26 +19,26 @@ export class Abieos {
      * Throws an error if an attempt is made to create a second instance.
      */
     private constructor() {
-        if (Abieos.instance) {
-            throw new Error(`${Abieos.logTag} Abieos is a Singleton class. Use Abieos.getInstance() to get the instance.`);
+        if (CoreAbi.instance) {
+            throw new Error(`${CoreAbi.logTag} CoreAbi is a Singleton class. Use CoreAbi.getInstance() to get the instance.`);
         }
-        Abieos.native = abieos;
+        CoreAbi.native = coreAbi;
     }
 
     /**
-     * Returns the singleton instance of the Abieos class.
+     * Returns the singleton instance of the CoreAbi class.
      * If an instance does not already exist, it creates one.
-     * @returns {Abieos} The singleton instance of Abieos.
+     * @returns {CoreAbi} The singleton instance of CoreAbi.
      */
-    public static getInstance(): Abieos {
-        if (!Abieos.instance) {
-            Abieos.instance = new Abieos();
+    public static getInstance(): CoreAbi {
+        if (!CoreAbi.instance) {
+            CoreAbi.instance = new CoreAbi();
         }
-        return Abieos.instance;
+        return CoreAbi.instance;
     }
 
     public getLoadedAbis(): string[] {
-        return Array.from(Abieos.loadedContracts.keys());
+        return Array.from(CoreAbi.loadedContracts.keys());
     }
 
     /**
@@ -48,20 +48,20 @@ export class Abieos {
     public cleanup(): void {
         /* node:coverage disable */
         const errors: any[] = [];
-        Abieos.loadedContracts.forEach((_, contractName) => {
+        CoreAbi.loadedContracts.forEach((_, contractName) => {
             try {
-                if (Abieos.debug) {
-                    console.log(`${Abieos.logTag} Cleaning up contract '${contractName}'...`);
+                if (CoreAbi.debug) {
+                    console.log(`${CoreAbi.logTag} Cleaning up contract '${contractName}'...`);
                 }
-                Abieos.native.delete_contract(contractName);
-                Abieos.loadedContracts.delete(contractName);
+                CoreAbi.native.delete_contract(contractName);
+                CoreAbi.loadedContracts.delete(contractName);
             } catch (e: any) {
                 errors.push({ contractName, error: e.message });
-                console.error(`${Abieos.logTag} Failed to delete contract '${contractName}' during cleanup: ${e.message}`);
+                console.error(`${CoreAbi.logTag} Failed to delete contract '${contractName}' during cleanup: ${e.message}`);
             }
         });
         if (errors.length > 0) {
-            throw new Error(`${Abieos.logTag} Errors during cleanup: ${JSON.stringify(errors)}`);
+            throw new Error(`${CoreAbi.logTag} Errors during cleanup: ${JSON.stringify(errors)}`);
         }
         /* node:coverage enable */
     }
@@ -74,9 +74,9 @@ export class Abieos {
     public stringToName(nameString: string): BigInt {
         // The native C++ function returns a JavaScript BigInt.
         try {
-            return Abieos.native.string_to_name(nameString) as BigInt;
+            return CoreAbi.native.string_to_name(nameString) as BigInt;
         } catch (e: any) {
-            throw new Error(`${Abieos.logTag} Failed to convert string to name '${nameString}': ${e.message}`);
+            throw new Error(`${CoreAbi.logTag} Failed to convert string to name '${nameString}': ${e.message}`);
         }
     }
 
@@ -91,9 +91,9 @@ export class Abieos {
     public jsonToHex(contractName: string, type: string, json: string | object): string {
         const jsonData = typeof json === 'object' ? JSON.stringify(json) : json;
         try {
-            return Abieos.native.json_to_hex(contractName, type, jsonData) as string;
+            return CoreAbi.native.json_to_hex(contractName, type, jsonData) as string;
         } catch (e: any) {
-            throw new Error(`${Abieos.logTag} Failed to convert JSON to hex for contract '${contractName}', type '${type}': ${e.message}`);
+            throw new Error(`${CoreAbi.logTag} Failed to convert JSON to hex for contract '${contractName}', type '${type}': ${e.message}`);
         }
     }
 
@@ -107,7 +107,7 @@ export class Abieos {
      */
     public hexToJson(contractName: string, type: string, hex: string): any {
         try {
-            const data = Abieos.native.hex_to_json(contractName, type, hex) as string;
+            const data = CoreAbi.native.hex_to_json(contractName, type, hex) as string;
             // Attempt to parse the string data as JSON.
             // This is still necessary as the native module returns a string.
             /* node:coverage disable */
@@ -117,12 +117,12 @@ export class Abieos {
                 // If JSON.parse fails, it means the string returned by native module was not valid JSON.
                 // This could be an error message string from C++ if it didn't throw an N-API error,
                 // or just malformed JSON.
-                throw new Error(`${Abieos.logTag} Failed to parse JSON string from hex for contract '${contractName}', type '${type}'. Received: ${data}. Parse error: ${parseError.message}`);
+                throw new Error(`${CoreAbi.logTag} Failed to parse JSON string from hex for contract '${contractName}', type '${type}'. Received: ${data}. Parse error: ${parseError.message}`);
             }
             /* node:coverage enable */
         } catch (e: any) {
             // This catches errors thrown by the N-API layer itself.
-            throw new Error(`${Abieos.logTag} Native error when converting hex to JSON for contract '${contractName}', type '${type}': ${e.message}`);
+            throw new Error(`${CoreAbi.logTag} Native error when converting hex to JSON for contract '${contractName}', type '${type}': ${e.message}`);
         }
     }
 
@@ -136,18 +136,18 @@ export class Abieos {
      */
     public binToJson(contractName: string, type: string, buffer: Buffer): any {
         try {
-            const data = Abieos.native.bin_to_json(contractName, type, buffer) as string;
+            const data = CoreAbi.native.bin_to_json(contractName, type, buffer) as string;
             // Attempt to parse the string data as JSON.
             /* node:coverage disable */
             try {
                 return JSON.parse(data);
             } catch (parseError: any) {
-                throw new Error(`${Abieos.logTag} Failed to parse JSON string from binary for contract '${contractName}', type '${type}'. Received: ${data}. Parse error: ${parseError.message}`);
+                throw new Error(`${CoreAbi.logTag} Failed to parse JSON string from binary for contract '${contractName}', type '${type}'. Received: ${data}. Parse error: ${parseError.message}`);
             }
             /* node:coverage enable */
         } catch (e: any) {
             // This catches errors thrown by the N-API layer itself.
-            throw new Error(`${Abieos.logTag} Native error when converting binary to JSON for contract '${contractName}', type '${type}': ${e.message}`);
+            throw new Error(`${CoreAbi.logTag} Native error when converting binary to JSON for contract '${contractName}', type '${type}': ${e.message}`);
         }
     }
 
@@ -160,25 +160,25 @@ export class Abieos {
      */
     public loadAbi(contractName: string, abi: string | object): boolean {
 
-        if (Abieos.debug && Abieos.loadedContracts.has(contractName)) {
-            console.info(`${Abieos.logTag} Contract '${contractName}' is already loaded. Updating ABI...`);
+        if (CoreAbi.debug && CoreAbi.loadedContracts.has(contractName)) {
+            console.info(`${CoreAbi.logTag} Contract '${contractName}' is already loaded. Updating ABI...`);
         }
 
         const abiString = typeof abi === 'object' ? JSON.stringify(abi) : abi;
         if (typeof abiString !== 'string') { // Should be caught by TS but good runtime check
-            throw new Error(`${Abieos.logTag} ABI must be a String or Object.`);
+            throw new Error(`${CoreAbi.logTag} ABI must be a String or Object.`);
         }
         try {
-            const loaded = Abieos.native.load_abi(contractName, abiString) as boolean;
+            const loaded = CoreAbi.native.load_abi(contractName, abiString) as boolean;
             if (loaded) {
-                Abieos.loadedContracts.set(contractName, Date.now());
-                if (Abieos.debug) {
-                    console.log(`${Abieos.logTag} Loaded ABI for contract '${contractName}'.`);
+                CoreAbi.loadedContracts.set(contractName, Date.now());
+                if (CoreAbi.debug) {
+                    console.log(`${CoreAbi.logTag} Loaded ABI for contract '${contractName}'.`);
                 }
             }
             return loaded;
         } catch (e: any) {
-            throw new Error(`${Abieos.logTag} Failed to load ABI for contract '${contractName}': ${e.message}`);
+            throw new Error(`${CoreAbi.logTag} Failed to load ABI for contract '${contractName}': ${e.message}`);
         }
     }
 
@@ -192,26 +192,26 @@ export class Abieos {
     public loadAbiHex(contractName: string, abihex: string): boolean {
 
         if (typeof abihex !== 'string') {
-            throw new Error(`${Abieos.logTag} ABI hex must be a String.`);
+            throw new Error(`${CoreAbi.logTag} ABI hex must be a String.`);
         }
 
         /* node:coverage disable */
-        if (Abieos.debug && Abieos.loadedContracts.has(contractName)) {
-            console.info(`${Abieos.logTag} Contract '${contractName}' is already loaded. Updating ABI...`);
+        if (CoreAbi.debug && CoreAbi.loadedContracts.has(contractName)) {
+            console.info(`${CoreAbi.logTag} Contract '${contractName}' is already loaded. Updating ABI...`);
         }
         /* node:coverage enable */
 
         try {
-            const loaded = Abieos.native.load_abi_hex(contractName, abihex);
+            const loaded = CoreAbi.native.load_abi_hex(contractName, abihex);
             if (loaded) {
-                Abieos.loadedContracts.set(contractName, Date.now());
-                if (Abieos.debug) {
-                    console.log(`${Abieos.logTag} Loaded ABI hex for contract '${contractName}'.`);
+                CoreAbi.loadedContracts.set(contractName, Date.now());
+                if (CoreAbi.debug) {
+                    console.log(`${CoreAbi.logTag} Loaded ABI hex for contract '${contractName}'.`);
                 }
             }
             return loaded;
         } catch (e: any) {
-            throw new Error(`${Abieos.logTag} Failed to load ABI hex for contract '${contractName}': ${e.message}`);
+            throw new Error(`${CoreAbi.logTag} Failed to load ABI hex for contract '${contractName}': ${e.message}`);
         }
     }
 
@@ -224,9 +224,9 @@ export class Abieos {
      */
     public getTypeForAction(contractName: string, actionName: string): string {
         try {
-            return Abieos.native.get_type_for_action(contractName, actionName) as string;
+            return CoreAbi.native.get_type_for_action(contractName, actionName) as string;
         } catch (e: any) {
-            throw new Error(`${Abieos.logTag} Failed to get type for action '${actionName}' in contract '${contractName}': ${e.message}`);
+            throw new Error(`${CoreAbi.logTag} Failed to get type for action '${actionName}' in contract '${contractName}': ${e.message}`);
         }
     }
 
@@ -239,30 +239,30 @@ export class Abieos {
      */
     public getTypeForTable(contractName: string, table_name: string): string {
         try {
-            return Abieos.native.get_type_for_table(contractName, table_name) as string;
+            return CoreAbi.native.get_type_for_table(contractName, table_name) as string;
         } catch (e: any) {
-            throw new Error(`${Abieos.logTag} Failed to get type for table '${table_name}' in contract '${contractName}': ${e.message}`);
+            throw new Error(`${CoreAbi.logTag} Failed to get type for table '${table_name}' in contract '${contractName}': ${e.message}`);
         }
     }
 
     /**
-     * Deletes a contract's ABI from the abieos context.
+     * Deletes a contract's ABI from the coreAbi context.
      * @param {string} contractName The name of the contract to delete.
      * @returns {boolean} True if the contract was successfully deleted, false otherwise.
      * @throws {Error} If deletion fails.
      */
     public deleteContract(contractName: string): boolean {
         try {
-            const deleted = Abieos.native.delete_contract(contractName);
+            const deleted = CoreAbi.native.delete_contract(contractName);
             if (deleted) {
-                Abieos.loadedContracts.delete(contractName);
-                if (Abieos.debug) {
-                    console.log(`${Abieos.logTag} Deleted contract '${contractName}' from abieos context.`);
+                CoreAbi.loadedContracts.delete(contractName);
+                if (CoreAbi.debug) {
+                    console.log(`${CoreAbi.logTag} Deleted contract '${contractName}' from coreAbi context.`);
                 }
             }
             return deleted;
         } catch (e: any) {
-            throw new Error(`${Abieos.logTag} Failed to delete contract '${contractName}': ${e.message}`);
+            throw new Error(`${CoreAbi.logTag} Failed to delete contract '${contractName}': ${e.message}`);
         }
     }
 }

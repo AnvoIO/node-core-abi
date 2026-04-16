@@ -1,12 +1,12 @@
-# Contributing to node-abieos
+# Contributing to node-core-abi
 
-Thank you for considering contributing to the node-abieos project! We welcome contributions from the community to help improve and maintain this project. This document provides guidelines and information for contributing to the project.
+Thank you for considering contributing to the node-core-abi project! We welcome contributions from the community to help improve and maintain this project. This document provides guidelines and information for contributing to the project.
 
 ## How to Contribute
 
 ### Reporting Issues
 
-If you encounter any issues or bugs while using node-abieos, please report them by creating a new issue in the [GitHub issue tracker](https://github.com/eosrio/node-abieos/issues). When reporting an issue, please provide as much detail as possible, including:
+If you encounter any issues or bugs while using node-core-abi, please report them by creating a new issue in the [GitHub issue tracker](https://github.com/AnvoIO/node-core-abi/issues). When reporting an issue, please provide as much detail as possible, including:
 
 - A clear and descriptive title
 - A detailed description of the issue
@@ -33,7 +33,7 @@ We welcome pull requests for bug fixes, new features, and improvements. To submi
 
 ### Coding Standards
 
-To ensure consistency and maintainability, please adhere to the following coding standards when contributing to node-abieos:
+To ensure consistency and maintainability, please adhere to the following coding standards when contributing to node-core-abi:
 
 - Follow the existing code style and conventions.
 - Write clear and concise code with appropriate comments.
@@ -43,7 +43,7 @@ To ensure consistency and maintainability, please adhere to the following coding
 
 ### Development Process
 
-The development process for node-abieos follows these general steps:
+The development process for node-core-abi follows these general steps:
 
 1. **Fork and Clone**: Fork the repository on GitHub and clone it to your local machine.
 2. **Create a Branch**: Create a new branch for your changes.
@@ -59,10 +59,10 @@ We expect all contributors to adhere to the [Code of Conduct](CODE_OF_CONDUCT.md
 
 ### Getting Help
 
-If you need help or have any questions about contributing to node-abieos, feel free to reach out by creating a new issue in the [GitHub issue tracker](https://github.com/eosrio/node-abieos/issues) or by joining our community discussions.
+If you need help or have any questions about contributing to node-core-abi, feel free to reach out by creating a new issue in the [GitHub issue tracker](https://github.com/AnvoIO/node-core-abi/issues) or by joining our community discussions.
 
 Thank you for your contributions and support!
 
 ## License
 
-By contributing to node-abieos, you agree that your contributions will be licensed under the [MIT License](../LICENSE).
+By contributing to node-core-abi, you agree that your contributions will be licensed under the [MIT License](../LICENSE).

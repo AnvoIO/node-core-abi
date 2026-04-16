@@ -1,70 +1,73 @@
-# node-abieos
+# node-core-abi
 
-![CI](https://github.com/eosrio/node-abieos/actions/workflows/build.yml/badge.svg)
-![Node-API v9 Badge](https://github.com/nodejs/abi-stable-node/blob/doc/assets/Node-API%20v9%20Badge.svg)
-[![NPM version](https://img.shields.io/npm/v/@eosrio/node-abieos.svg?style=flat)](https://www.npmjs.com/package/@eosrio/node-abieos)
-[![Coverage Status](https://coveralls.io/repos/github/eosrio/node-abieos/badge.svg?branch=master)](https://coveralls.io/github/eosrio/node-abieos?branch=master)
+[![MIT licensed][1]][2]
 
-Node.js native binding for [abieos](https://github.com/AntelopeIO/abieos), with some improvements:
+[1]: https://img.shields.io/badge/license-MIT-blue.svg
+[2]: LICENSE
 
-- Internal loaded contract map
-- deleteContract: to remove the loaded contract from memory (now in vanilla abieos too)
+Node.js N-API native binding for [core-abi](https://github.com/AnvoIO/core-abi). Binary ↔ JSON conversion of ABI-encoded data for Anvo Core, Antelope, and EOSIO chains.
 
-Made with ♥ by [EOS Rio](https://eosrio.io/)
+Based on [eosrio/node-abieos](https://github.com/eosrio/node-abieos) with first-class support for the `core_net::abi/*` version prefix emitted by chains bootstrapped under the Anvo Core `core_net` namespace.
 
-----
-**Only Linux is supported for now**
+## Features
 
-- Typescript typings included
-- Prebuilt binary included (Clang 18 required to build)
-- Now supports NodeJS, Deno, and Bun runtimes.
+- **Native Anvo Core support** — accepts `core_net::abi/{1,2}.x` ABI version prefixes alongside `eosio::abi/{1,2}.x`.
+- **Singleton binding** — single global N-API context shared across the process.
+- **Loaded-contract map** — internal tracking with `getLoadedAbis()` and `cleanup()`.
+- **Cross-runtime** — Node.js, Deno, and Bun.
+- **TypeScript typings included.**
 
 ## Install
 
-```shell script
-npm i @eosrio/node-abieos --save
+```bash
+npm i @anvoio/node-core-abi --save
 ```
 
 ## Usage
 
-CommonJS
-
-```js
-const nodeAbieos = require('@eosrio/node-abieos');
-```
-
-ES Modules (NodeJS, Bun)
+### Node.js (ES Modules)
 
 ```typescript
-import {Abieos} from "@eosrio/node-abieos";
-const abieos = Abieos.getInstance();
+import { CoreAbi } from '@anvoio/node-core-abi';
+
+const coreAbi = CoreAbi.getInstance();
+coreAbi.loadAbi('eosio.token', tokenAbiJson);
+const hex = coreAbi.jsonToHex('eosio.token', 'transfer', JSON.stringify({
+    from: 'alice',
+    to: 'bob',
+    quantity: '1.0000 SYS',
+    memo: ''
+}));
 ```
 
-Deno
+### Node.js (CommonJS)
+
+```js
+const { CoreAbi } = require('@anvoio/node-core-abi');
+```
+
+### Deno
 
 ```bash
 # examples/basic.cjs can be run with:
 deno run --allow-ffi --allow-read examples/basic.cjs
 
 # For an example using the published npm package with Deno:
-# Check the examples/deno-abieos-test folder
-cd examples/deno-abieos-test
+cd examples/deno-core-abi-test
 deno run --allow-ffi --allow-read main.ts
 ```
 
-Bun
+### Bun
 
-```shell script
-# examples/basic.mjs can be run with:
+```bash
 bun run examples/basic.mjs
 ```
 
-Check the [/examples](https://github.com/eosrio/node-abieos/tree/master/examples) folder for implementation examples
+See the [examples/](./examples) folder for more.
 
-## Building
+## Build from Source
 
-Make sure you have Clang installed on your system:
-We recommend using Clang 18 to build the `abieos` C++ library.
+Requires Clang 18+:
 
 ```bash
 wget https://apt.llvm.org/llvm.sh
@@ -72,18 +75,50 @@ chmod +x llvm.sh
 sudo ./llvm.sh 18
 ```
 
-Clone and Build
+Clone and build:
 
-```shell script
-git clone https://github.com/eosrio/node-abieos.git --recursive
-cd node-abieos
+```bash
+git clone https://github.com/AnvoIO/node-core-abi.git --recursive
+cd node-core-abi
 npm install
-npm run build:linux
-npm run build
+npm run build:linux   # cmake-js compile + copy native module
+npm run build         # tsup (TypeScript bundling)
 ```
 
-### Documentation
+## ABI Version Compatibility
 
-For detailed and user-friendly documentation, including installation, usage, API reference, error handling, debugging, and examples, please refer to the [documentation](docs/README.md).
+| Version prefix | Accepted on ingest |
+|---|---|
+| `eosio::abi/1.0` through `eosio::abi/2.x` | yes |
+| `core_net::abi/1.0` through `core_net::abi/2.x` | yes |
 
-For contribution guidelines and developer documentation, refer to the [contribution guidelines](docs/CONTRIBUTING.md).
+Anvo Core emits the version prefix that matches the chain's heritage: eosio-bootstrapped chains emit `eosio::abi/*`; chains bootstrapped fresh under `core_net` emit `core_net::abi/*`. See [AnvoIO/core#105](https://github.com/AnvoIO/core/issues/105) for context.
+
+## Supported Platforms
+
+| Platform | Architecture | Status |
+|---|---|---|
+| Linux (Ubuntu 22.04+) | x86_64, ARM64 | Primary — CI tested |
+| macOS | x86_64, ARM64 | Best-effort |
+| Windows | x86_64 | Best-effort |
+
+Prebuilt binaries may not be available for all platforms; build from source if needed.
+
+## Migration from @eosrio/node-abieos
+
+Downstream consumers migrating from `@eosrio/node-abieos` need the following changes:
+
+- Package name: `@eosrio/node-abieos` → `@anvoio/node-core-abi`
+- Class name: `Abieos` → `CoreAbi`
+- Log tag: `[node-abieos]` → `[node-core-abi]`
+- Native binding file: `abieos.node` → `core-abi.node` (internal; transparent to JS consumers)
+
+The runtime API surface is otherwise unchanged. Existing code calling `Abieos.getInstance().loadAbi(...)` becomes `CoreAbi.getInstance().loadAbi(...)`.
+
+## License
+
+[MIT](./LICENSE). See [NOTICE](./NOTICE) for upstream attributions.
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md).

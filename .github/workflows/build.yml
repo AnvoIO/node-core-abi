@@ -5,17 +5,22 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+  workflow_dispatch:
 
 env:
   BUILD_TYPE: Release
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: build (${{ matrix.runner.arch }}, node-${{ matrix.node-version }})
+    runs-on: ${{ matrix.runner.os }}
     strategy:
+      fail-fast: false
       matrix:
         node-version: [22.x, 24.x, 25.x]
-      fail-fast: false
+        runner:
+          - { os: ubuntu-latest,     arch: x64 }
+          - { os: ubuntu-24.04-arm,  arch: arm64 }
 
     steps:
     # Checkout repo and submodules
@@ -24,16 +29,16 @@ jobs:
       with:
         submodules: recursive
 
-    # Cache CMake build files
+    # Cache CMake build files (keyed on arch so x64 and arm64 don't collide)
     - name: Cache CMake build
       uses: actions/cache@v4
       with:
         path: |
           build
           ~/.cmake
-        key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', 'abieos/**') }}
+        key: ${{ runner.os }}-${{ matrix.runner.arch }}-cmake-${{ hashFiles('CMakeLists.txt', 'core-abi/**') }}
         restore-keys: |
-          ${{ runner.os }}-cmake-
+          ${{ runner.os }}-${{ matrix.runner.arch }}-cmake-
 
     # Setup Node.js
     - name: Use Node.js ${{ matrix.node-version }}
@@ -59,11 +64,11 @@ jobs:
       run: npm test
 
     - name: Run coverage tests
-      if: matrix.node-version == '22.x'
+      if: matrix.node-version == '22.x' && matrix.runner.arch == 'x64'
       run: npm run test:coverage
 
     - name: Upload coverage to Coveralls
-      if: matrix.node-version == '22.x'
+      if: matrix.node-version == '22.x' && matrix.runner.arch == 'x64'
       uses: coverallsapp/github-action@v2
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
@@ -75,14 +80,21 @@ jobs:
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: build-logs-node-${{ matrix.node-version }}
+        name: build-logs-${{ matrix.runner.arch }}-node-${{ matrix.node-version }}
         path: |
           build/**/*.log
           npm-debug.log*
         if-no-files-found: ignore
 
   bun-test:
-    runs-on: ubuntu-latest
+    name: bun-test (${{ matrix.runner.arch }})
+    runs-on: ${{ matrix.runner.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - { os: ubuntu-latest,     arch: x64 }
+          - { os: ubuntu-24.04-arm,  arch: arm64 }
 
     steps:
     - name: Checkout repository
@@ -96,9 +108,9 @@ jobs:
         path: |
           build
           ~/.cmake
-        key: ${{ runner.os }}-cmake-bun-${{ hashFiles('CMakeLists.txt', 'abieos/**') }}
+        key: ${{ runner.os }}-${{ matrix.runner.arch }}-cmake-bun-${{ hashFiles('CMakeLists.txt', 'core-abi/**') }}
         restore-keys: |
-          ${{ runner.os }}-cmake-bun-
+          ${{ runner.os }}-${{ matrix.runner.arch }}-cmake-bun-
 
     - name: Setup Bun
       uses: oven-sh/setup-bun@v2
@@ -126,7 +138,7 @@ jobs:
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: build-logs-bun
+        name: build-logs-bun-${{ matrix.runner.arch }}
         path: |
           build/**/*.log
         if-no-files-found: ignore

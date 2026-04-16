@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) where possible.
 
+## [1.0.0-alpha.1] - 2026-04-16
+
+> Rebrand release. Package renamed from `@eosrio/node-abieos` to `@anvoio/node-core-abi`. New lineage starts at `1.0.0-alpha.1`; upstream history preserved in entries below.
+
+### Changed
+- **Package name:** `@eosrio/node-abieos` → `@anvoio/node-core-abi`.
+- **TypeScript class:** `Abieos` → `CoreAbi`.
+- **Native binary:** `abieos.node` → `core-abi.node`.
+- **Log tag:** `[node-abieos]` → `[node-core-abi]`.
+- **Submodule:** `abieos/` → `core-abi/`, repinned to [`AnvoIO/core-abi`](https://github.com/AnvoIO/core-abi) post-rebrand.
+- **C API surface:** `abieos_*` symbols renamed to `core_abi_*` (no legacy aliases). Source consumers must rebuild; binary consumers must recompile.
+- **CMake project:** `node_abieos` → `node_core_abi`.
+- **License attribution:** extended MIT attribution chain to include Stratovera LLC 2026, preserving EOS Rio, ENF, and block.one copyright notices.
+
+### Runtime API
+- No change — `CoreAbi.getInstance().loadAbi(contract, abi)`, `jsonToHex`, `hexToJson`, `getLoadedAbis`, `cleanup`, etc. behave identically to the predecessor's `Abieos.*` methods.
+
+### Migration
+- See [README § Migration from @eosrio/node-abieos](./README.md#migration-from-eosrionode-abieos).
+
+---
+
 ## [4.1.0-f7d5b45] - 2026-02-21
 
 > The `-f7d5b45` suffix denotes the upstream `AntelopeIO/abieos` commit hash bundled with this release.

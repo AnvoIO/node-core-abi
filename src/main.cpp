@@ -5,32 +5,32 @@
 #include <string>
 #include <iostream> // Will be removed for proper N-API logging
 
-#include "../abieos/src/abieos.h"
-#include "../abieos/src/abieos.hpp"
+#include "../core-abi/src/core_abi.h"
+#include "../core-abi/src/core_abi.hpp"
 
-// Global abieos context, managed across N-API calls.
+// Global core-abi context, managed across N-API calls.
 // It's initialized once and destroyed when the environment cleans up.
-abieos_context* global_context = nullptr;
+core_abi_context* global_context = nullptr;
 
 /**
- * Helper function to get the global abieos context.
+ * Helper function to get the global core-abi context.
  * If the context is not yet created, it will create it.
  * This function should ideally be called once during module initialization.
  * @param env Napi::Env environment for error handling.
- * @returns abieos_context* The global abieos context.
+ * @returns core_abi_context* The global core-abi context.
  * @throws Napi::Error if context creation fails.
  */
-abieos_context* get_or_create_context(Napi::Env env) {
+core_abi_context* get_or_create_context(Napi::Env env) {
     if (global_context == nullptr) {
-        global_context = abieos_create();
+        global_context = core_abi_create();
         if (global_context == nullptr) {
-            Napi::Error::New(env, "Failed to create abieos context.").ThrowAsJavaScriptException();
+            Napi::Error::New(env, "Failed to create core-abi context.").ThrowAsJavaScriptException();
             return nullptr;
         }
         // Add a cleanup hook to destroy the context when the Node.js environment exits.
         env.AddCleanupHook([]() {
             if (global_context != nullptr) {
-                abieos_destroy(global_context);
+                core_abi_destroy(global_context);
                 global_context = nullptr;
             }
         });
@@ -49,18 +49,18 @@ abieos_context* get_or_create_context(Napi::Env env) {
  */
 std::string json_to_hex(Napi::Env env, const char *contract_name, const char *type, const char *json)
 {
-    abieos_context* context = get_or_create_context(env);
+    core_abi_context* context = get_or_create_context(env);
     if (!context) return ""; // Error already thrown by get_or_create_context
 
-    uint64_t contract = abieos_string_to_name(context, contract_name);
-    bool status = abieos_json_to_bin(context, contract, type, json);
+    uint64_t contract = core_abi_string_to_name(context, contract_name);
+    bool status = core_abi_json_to_bin(context, contract, type, json);
     if (!status) {
-        Napi::Error::New(env, abieos_get_error(context)).ThrowAsJavaScriptException();
+        Napi::Error::New(env, core_abi_get_error(context)).ThrowAsJavaScriptException();
         return "";
     }
-    const char* results = abieos_get_bin_hex(context);
+    const char* results = core_abi_get_bin_hex(context);
     if (results == nullptr) {
-        Napi::Error::New(env, abieos_get_error(context)).ThrowAsJavaScriptException();
+        Napi::Error::New(env, core_abi_get_error(context)).ThrowAsJavaScriptException();
         return "";
     }
     return std::string(results);
@@ -77,13 +77,13 @@ std::string json_to_hex(Napi::Env env, const char *contract_name, const char *ty
  */
 std::string hex_to_json(Napi::Env env, const char *contract_name, const char *type, const char *hex)
 {
-    abieos_context* context = get_or_create_context(env);
+    core_abi_context* context = get_or_create_context(env);
     if (!context) return ""; // Error already thrown by get_or_create_context
 
-    uint64_t contract = abieos_string_to_name(context, contract_name);
-    const char* results = abieos_hex_to_json(context, contract, type, hex);
+    uint64_t contract = core_abi_string_to_name(context, contract_name);
+    const char* results = core_abi_hex_to_json(context, contract, type, hex);
     if (results == nullptr) {
-        Napi::Error::New(env, abieos_get_error(context)).ThrowAsJavaScriptException();
+        Napi::Error::New(env, core_abi_get_error(context)).ThrowAsJavaScriptException();
         return "";
     }
     return std::string(results);
@@ -101,13 +101,13 @@ std::string hex_to_json(Napi::Env env, const char *contract_name, const char *ty
  */
 std::string bin_to_json(Napi::Env env, const char *contract_name, const char *type, const char *bin, int size)
 {
-    abieos_context* context = get_or_create_context(env);
+    core_abi_context* context = get_or_create_context(env);
     if (!context) return ""; // Error already thrown by get_or_create_context
 
-    uint64_t contract = abieos_string_to_name(context, contract_name);
-    const char* results = abieos_bin_to_json(context, contract, type, bin, size);
+    uint64_t contract = core_abi_string_to_name(context, contract_name);
+    const char* results = core_abi_bin_to_json(context, contract, type, bin, size);
     if (results == nullptr) {
-        Napi::Error::New(env, abieos_get_error(context)).ThrowAsJavaScriptException();
+        Napi::Error::New(env, core_abi_get_error(context)).ThrowAsJavaScriptException();
         return "";
     }
     return std::string(results);
@@ -168,7 +168,7 @@ Napi::String BinToJsonWrapped(const Napi::CallbackInfo &info)
 }
 
 /**
- * Converts a string to an abieos name (uint64_t).
+ * Converts a string to an core-abi name (uint64_t).
  * Throws Napi::Error on context creation failure.
  * @param env Napi::Env environment.
  * @param str The string to convert.
@@ -176,9 +176,9 @@ Napi::String BinToJsonWrapped(const Napi::CallbackInfo &info)
  */
 uint64_t string_to_name(Napi::Env env, const char *str)
 {
-    abieos_context* context = get_or_create_context(env);
+    core_abi_context* context = get_or_create_context(env);
     if (!context) return 0; // Error already thrown by get_or_create_context
-    return abieos_string_to_name(context, str);
+    return core_abi_string_to_name(context, str);
 }
 
 /**
@@ -208,15 +208,15 @@ Napi::BigInt StringToNameWrapped(const Napi::CallbackInfo &info)
  */
 bool load_abi(Napi::Env env, const char *contract_name, const char *abi)
 {
-    abieos_context* context = get_or_create_context(env);
+    core_abi_context* context = get_or_create_context(env);
     if (!context) return false; // Error already thrown by get_or_create_context
 
-    uint64_t contract = abieos_string_to_name(context, contract_name);
+    uint64_t contract = core_abi_string_to_name(context, contract_name);
     // Delete existing contract ABI before setting a new one to ensure clean state
-    abieos_delete_contract(context, contract);
-    bool abi_status = abieos_set_abi(context, contract, abi);
+    core_abi_delete_contract(context, contract);
+    bool abi_status = core_abi_set_abi(context, contract, abi);
     if (!abi_status) {
-        Napi::Error::New(env, abieos_get_error(context)).ThrowAsJavaScriptException();
+        Napi::Error::New(env, core_abi_get_error(context)).ThrowAsJavaScriptException();
         return false;
     }
     return true;
@@ -249,15 +249,15 @@ Napi::Boolean LoadAbiWrapped(const Napi::CallbackInfo &info)
  */
 bool load_abi_hex(Napi::Env env, const char *contract_name, const char *hex)
 {
-    abieos_context* context = get_or_create_context(env);
+    core_abi_context* context = get_or_create_context(env);
     if (!context) return false; // Error already thrown by get_or_create_context
 
-    uint64_t contract = abieos_string_to_name(context, contract_name);
+    uint64_t contract = core_abi_string_to_name(context, contract_name);
     // Delete existing contract ABI before setting a new one to ensure clean state
-    abieos_delete_contract(context, contract);
-    bool abi_status = abieos_set_abi_hex(context, contract, hex);
+    core_abi_delete_contract(context, contract);
+    bool abi_status = core_abi_set_abi_hex(context, contract, hex);
     if (!abi_status) {
-        Napi::Error::New(env, abieos_get_error(context)).ThrowAsJavaScriptException();
+        Napi::Error::New(env, core_abi_get_error(context)).ThrowAsJavaScriptException();
         return false;
     }
     return true;
@@ -290,14 +290,14 @@ Napi::Boolean LoadAbiHexWrapped(const Napi::CallbackInfo &info)
  */
 std::string get_type_for_action(Napi::Env env, const char *contract_name, const char *action_name)
 {
-    abieos_context* context = get_or_create_context(env);
+    core_abi_context* context = get_or_create_context(env);
     if (!context) return ""; // Error already thrown by get_or_create_context
 
-    uint64_t contract = abieos_string_to_name(context, contract_name);
-    uint64_t action = abieos_string_to_name(context, action_name);
-    const char* result = abieos_get_type_for_action(context, contract, action);
+    uint64_t contract = core_abi_string_to_name(context, contract_name);
+    uint64_t action = core_abi_string_to_name(context, action_name);
+    const char* result = core_abi_get_type_for_action(context, contract, action);
     if (result == nullptr) {
-        Napi::Error::New(env, abieos_get_error(context)).ThrowAsJavaScriptException();
+        Napi::Error::New(env, core_abi_get_error(context)).ThrowAsJavaScriptException();
         return "";
     }
     return std::string(result);
@@ -313,14 +313,14 @@ std::string get_type_for_action(Napi::Env env, const char *contract_name, const 
  */
 std::string get_type_for_table(Napi::Env env, const char *contract_name, const char *table_name)
 {
-    abieos_context* context = get_or_create_context(env);
+    core_abi_context* context = get_or_create_context(env);
     if (!context) return ""; // Error already thrown by get_or_create_context
 
-    uint64_t contract = abieos_string_to_name(context, contract_name);
-    uint64_t table = abieos_string_to_name(context, table_name);
-    const char* result = abieos_get_type_for_table(context, contract, table);
+    uint64_t contract = core_abi_string_to_name(context, contract_name);
+    uint64_t table = core_abi_string_to_name(context, table_name);
+    const char* result = core_abi_get_type_for_table(context, contract, table);
     if (result == nullptr) {
-        Napi::Error::New(env, abieos_get_error(context)).ThrowAsJavaScriptException();
+        Napi::Error::New(env, core_abi_get_error(context)).ThrowAsJavaScriptException();
         return "";
     }
     return std::string(result);
@@ -361,18 +361,18 @@ Napi::String GetTableTypeWrapped(const Napi::CallbackInfo &info)
 }
 
 /**
- * Deletes a contract's ABI from the abieos context.
+ * Deletes a contract's ABI from the core-abi context.
  * Throws Napi::Error on context creation failure.
  * @param env Napi::Env environment.
  * @param contract_name The contract name.
  * @returns bool True if successful, false otherwise.
  */
 bool delete_contract(Napi::Env env, const char *contract_name) {
-    abieos_context* context = get_or_create_context(env);
+    core_abi_context* context = get_or_create_context(env);
     if (!context) return false; // Error already thrown by get_or_create_context
 
-    uint64_t contract = abieos_string_to_name(context, contract_name);
-    return abieos_delete_contract(context, contract);
+    uint64_t contract = core_abi_string_to_name(context, contract_name);
+    return core_abi_delete_contract(context, contract);
 }
 
 /**
@@ -414,4 +414,4 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     return exports;
 }
 
-NODE_API_MODULE(abieos, Init);
+NODE_API_MODULE(core_abi, Init);

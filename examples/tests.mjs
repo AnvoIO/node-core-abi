@@ -1,4 +1,4 @@
-export function typeTests(abieos) {
+export function typeTests(coreAbi) {
 
     const typeTests = [
         {type: 'action', code: 'eosio', name: 'voteproducer', expects: 'voteproducer'},
@@ -14,8 +14,8 @@ export function typeTests(abieos) {
         console.log(`[${index + 1}/${typeTests.length}] Testing ${value.type} type for ${value.code}::${value.name}`);
         try {
             const type = value.type === 'action' ?
-                abieos.getTypeForAction(value.code, value.name) :
-                abieos.getTypeForTable(value.code, value.name);
+                coreAbi.getTypeForAction(value.code, value.name) :
+                coreAbi.getTypeForTable(value.code, value.name);
             if (type === value.expects) {
                 console.log(`OK - ${type} === ${value.expects}`);
             } else {

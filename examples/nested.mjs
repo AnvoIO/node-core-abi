@@ -1,7 +1,7 @@
-import {Abieos} from "@eosrio/node-abieos";
+import {CoreAbi} from "@anvoio/node-core-abi";
 import {ABI, Serializer} from "@wharfkit/antelope";
 
-const abieos = Abieos.getInstance();
+const coreAbi = CoreAbi.getInstance();
 
 const abi = ABI.from({
     types: [
@@ -56,22 +56,22 @@ const deserializedData = Serializer.decode({
 console.log("Deserialized Data (Wharfkit)", Serializer.objectify(deserializedData));
 
 // loading ABI
-const status = abieos.loadAbi('test', abi.toJSON());
+const status = coreAbi.loadAbi('test', abi.toJSON());
 if (status) {
 
     // deserialize
-    const abieosDecoded = abieos.hexToJson('test', 'nested', hexData);
-    console.log("Deserialized Data (ABIEOS)", abieosDecoded);
-    if (JSON.stringify(abieosDecoded) !== inputString) {
+    const coreAbiDecoded = coreAbi.hexToJson('test', 'nested', hexData);
+    console.log("Deserialized Data (core-abi)", coreAbiDecoded);
+    if (JSON.stringify(coreAbiDecoded) !== inputString) {
         console.error(`Input / Output Mismatch`);
     } else {
         console.log('JSON Data Matched!');
     }
 
     // serialize again
-    const abieosEncoded = abieos.jsonToHex('test', 'nested', abieosDecoded);
-    console.log("HEX Data (ABIEOS)\n", abieosEncoded);
-    if (hexData !== abieosEncoded) {
+    const coreAbiEncoded = coreAbi.jsonToHex('test', 'nested', coreAbiDecoded);
+    console.log("HEX Data (core-abi)\n", coreAbiEncoded);
+    if (hexData !== coreAbiEncoded) {
         console.error(`Hex Data Mismatch`);
     } else {
         console.log('HEX Data Matched!');

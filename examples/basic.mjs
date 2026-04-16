@@ -1,4 +1,4 @@
-import {Abieos} from "@eosrio/node-abieos";
+import {CoreAbi} from "@anvoio/node-core-abi";
 import {readFileSync} from "node:fs";
 import {join} from "node:path";
 import { Buffer } from "node:buffer"
@@ -10,25 +10,25 @@ const ABIs = [
     {code: 'eosio.token', path: './ABIs/eosio.token.raw'}
 ];
 
-const abieos = Abieos.getInstance();
+const coreAbi = CoreAbi.getInstance();
 
 ABIs.forEach(value => {
     const data = readFileSync(join(import.meta.dirname,value.path)).toString();
     console.log(`Loading ${value.code} ABI...`);
     if (value.path.endsWith('raw')) {
         const buffer = Buffer.from(data, 'base64');
-        const abiLoadStatus = abieos.loadAbiHex(value.code, buffer.toString('hex'));
+        const abiLoadStatus = coreAbi.loadAbiHex(value.code, buffer.toString('hex'));
         console.log(`${value.code} ABI as HEX Loaded: ${abiLoadStatus}`);
     } else {
-        const abiLoadStatus = abieos.loadAbi(value.code, data);
+        const abiLoadStatus = coreAbi.loadAbi(value.code, data);
         console.log(`${value.code} ABI as JSON Loaded: ${abiLoadStatus}`);
     }
 });
 
-typeTests(abieos);
+typeTests(coreAbi);
 
 // stringToName
-console.log('stringToName: eosio -->', abieos.stringToName('eosio'));
+console.log('stringToName: eosio -->', coreAbi.stringToName('eosio'));
 
 const serializationTests = [
     {
@@ -49,14 +49,14 @@ const runSerializationTests = () => {
         // seriallize action data
         const tref = process.hrtime.bigint();
         let actionHexData;
-        const type = abieos.getTypeForAction(value.account, value.name);
+        const type = coreAbi.getTypeForAction(value.account, value.name);
         try {
-            actionHexData = abieos.jsonToHex(value.account, type, value.data);
+            actionHexData = coreAbi.jsonToHex(value.account, type, value.data);
             // console.log(actionHexData);
             if (actionHexData !== value.expects) {
                 console.log(`ERROR - Got: ${actionHexData}, Expected: ${value.expects}`);
             }
-            abieos.hexToJson(value.account, type, actionHexData);
+            coreAbi.hexToJson(value.account, type, actionHexData);
         } catch (e) {
             console.log(e);
         }
@@ -74,7 +74,7 @@ for (let i = 0; i < totalRuns; i++) {
 console.log(`Average execution (getTypeForAction + jsonToHex + hexToJson): ${sum / totalRuns} us on ${totalRuns} runs`);
 
 // delete contract from cache, returns true or false
-const status = abieos.deleteContract("eosio");
+const status = coreAbi.deleteContract("eosio");
 if (status) {
     console.log('OK - contract deleted');
 } else {
@@ -83,7 +83,7 @@ if (status) {
 
 // check whether the contract was deleted
 try {
-    abieos.getTypeForAction("eosio", "voteproducer");
+    coreAbi.getTypeForAction("eosio", "voteproducer");
 } catch (e) {
     console.log('OK - Contract context removal confirmed');
 }

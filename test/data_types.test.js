@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { Abieos } from '../dist/abieos.js';
+import { CoreAbi } from '../dist/core-abi.js';
 
 test.describe('Specific Data Type Serialization/Deserialization', () => {
-    const abieos = Abieos.getInstance();
+    const coreAbi = CoreAbi.getInstance();
 
     // Constants specific to this test suite
     const contract = 'datatype.test';
@@ -29,9 +29,9 @@ test.describe('Specific Data Type Serialization/Deserialization', () => {
         variants: [],
     };
 
-    Abieos.debug = true;
-    abieos.cleanup();
-    abieos.loadAbi(contract, abi);
+    CoreAbi.debug = true;
+    coreAbi.cleanup();
+    coreAbi.loadAbi(contract, abi);
 
 
     test('should serialize and deserialize basic types correctly', () => {
@@ -43,10 +43,10 @@ test.describe('Specific Data Type Serialization/Deserialization', () => {
             f_name: "eosio.token"
         };
 
-        const hex = abieos.jsonToHex(contract, 'basic_types', basicTypesData);
+        const hex = coreAbi.jsonToHex(contract, 'basic_types', basicTypesData);
         assert.ok(typeof hex === 'string' && hex.length > 0, 'Serialization should produce hex');
 
-        const deserialized = abieos.hexToJson(contract, 'basic_types', hex);
+        const deserialized = coreAbi.hexToJson(contract, 'basic_types', hex);
         assert.deepStrictEqual(deserialized, basicTypesData, 'Deserialized data should match original');
     });
 });

@@ -1,19 +1,19 @@
 {
-  "name": "@eosrio/node-abieos",
-  "version": "4.1.0-f7d5b45",
+  "name": "@anvoio/node-core-abi",
+  "version": "1.0.0-alpha.1",
   "publishConfig": {
     "access": "public",
     "tag": "latest"
   },
-  "description": "Node Bindings for abieos: Binary <> JSON conversion using ABIs.",
-  "main": "./dist/abieos.js",
-  "types": "./dist/abieos.d.ts",
+  "description": "Node bindings for core-abi: binary <> JSON conversion using ABIs. Native Anvo Core (core_net) support with full Antelope/EOSIO compatibility.",
+  "main": "./dist/core-abi.js",
+  "types": "./dist/core-abi.d.ts",
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/abieos.d.ts",
-      "import": "./dist/abieos.js",
-      "require": "./dist/abieos.cjs"
+      "types": "./dist/core-abi.d.ts",
+      "import": "./dist/core-abi.js",
+      "require": "./dist/core-abi.cjs"
     }
   },
   "scripts": {
@@ -31,14 +31,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eosrio/node-abieos.git"
+    "url": "git+https://github.com/AnvoIO/node-core-abi.git"
   },
-  "author": "EOS Rio",
+  "author": "Stratovera LLC",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/eosrio/node-abieos/issues"
+    "url": "https://github.com/AnvoIO/node-core-abi/issues"
   },
-  "homepage": "https://github.com/eosrio/node-abieos#readme",
+  "homepage": "https://github.com/AnvoIO/node-core-abi#readme",
   "devDependencies": {
     "@microsoft/api-extractor": "^7.57.2",
     "@types/node": "^25.3.0",

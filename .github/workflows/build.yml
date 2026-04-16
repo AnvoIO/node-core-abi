@@ -31,7 +31,7 @@ jobs:
         path: |
           build
           ~/.cmake
-        key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', 'abieos/**') }}
+        key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', 'core-abi/**') }}
         restore-keys: |
           ${{ runner.os }}-cmake-
 
@@ -96,7 +96,7 @@ jobs:
         path: |
           build
           ~/.cmake
-        key: ${{ runner.os }}-cmake-bun-${{ hashFiles('CMakeLists.txt', 'abieos/**') }}
+        key: ${{ runner.os }}-cmake-bun-${{ hashFiles('CMakeLists.txt', 'core-abi/**') }}
         restore-keys: |
           ${{ runner.os }}-cmake-bun-
 

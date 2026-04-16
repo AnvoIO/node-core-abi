@@ -1,12 +1,12 @@
 /**
- * Abieos class provides a singleton instance for interacting with the native abieos module.
- * This pattern is used to ensure a single global context for the underlying C++ abieos library,
+ * CoreAbi class provides a singleton instance for interacting with the native coreAbi module.
+ * This pattern is used to ensure a single global context for the underlying C++ coreAbi library,
  * which manages internal state and resources.
  */
-export declare class Abieos {
+export declare class CoreAbi {
     static logTag: string;
     private static instance;
-    static native: typeof abieos;
+    static native: typeof coreAbi;
     private static loadedContracts;
     static debug: boolean;
     /**
@@ -15,11 +15,11 @@ export declare class Abieos {
      */
     private constructor();
     /**
-     * Returns the singleton instance of the Abieos class.
+     * Returns the singleton instance of the CoreAbi class.
      * If an instance does not already exist, it creates one.
-     * @returns {Abieos} The singleton instance of Abieos.
+     * @returns {CoreAbi} The singleton instance of CoreAbi.
      */
-    static getInstance(): Abieos;
+    static getInstance(): CoreAbi;
     getLoadedAbis(): string[];
     /**
      * Cleans up all loaded contracts by deleting them from the native context.
@@ -92,7 +92,7 @@ export declare class Abieos {
      */
     getTypeForTable(contractName: string, table_name: string): string;
     /**
-     * Deletes a contract's ABI from the abieos context.
+     * Deletes a contract's ABI from the coreAbi context.
      * @param {string} contractName The name of the contract to delete.
      * @returns {boolean} True if the contract was successfully deleted, false otherwise.
      * @throws {Error} If deletion fails.
@@ -100,6 +100,6 @@ export declare class Abieos {
     deleteContract(contractName: string): boolean;
 }
 
-declare const abieos: any;
+declare const coreAbi: any;
 
 export { }

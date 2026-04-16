@@ -1,7 +1,7 @@
-import { Abieos } from "@eosrio/node-abieos";
+import { CoreAbi } from "@anvoio/node-core-abi";
 
-// Create an instance of Abieos
-const abieos = Abieos.getInstance();
+// Create an instance of CoreAbi
+const coreAbi = CoreAbi.getInstance();
 
 // Fetch the ABI from the blockchain API
 async function fetchAbi(contractName) {
@@ -17,7 +17,7 @@ async function fetchAbi(contractName) {
 // Load the ABI for the contract
 async function loadAbiFromBlockchain(contractName) {
     const abi = await fetchAbi(contractName);
-    abieos.loadAbi(contractName, abi);
+    coreAbi.loadAbi(contractName, abi);
 }
 
 // Define the JSON data to be converted
@@ -34,11 +34,11 @@ async function main() {
     await loadAbiFromBlockchain(contractName);
 
     // Convert JSON to hex
-    const hex = abieos.jsonToHex(contractName, "transfer", json);
+    const hex = coreAbi.jsonToHex(contractName, "transfer", json);
     console.log("Hex:", hex);
 
     // Convert hex back to JSON
-    const parsedJson = abieos.hexToJson(contractName, "transfer", hex);
+    const parsedJson = coreAbi.hexToJson(contractName, "transfer", hex);
     console.log("Parsed JSON:", parsedJson);
 }
 

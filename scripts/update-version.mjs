@@ -15,7 +15,7 @@ console.log(`Old version: ${version}`);
 console.log(`Old hash: ${hash}`);
 
 exec('git rev-parse --short HEAD', {
-    cwd: './abieos',
+    cwd: './core-abi',
 }, (error, stdout) => {
     if (error) {
         console.error('Failed to get git hash');

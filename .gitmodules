@@ -1,3 +1,3 @@
 [submodule "abieos"]
 	path = abieos
-	url = https://github.com/AnvoIO/abi.git
+	url = https://github.com/AnvoIO/core-abi.git

@@ -1,4 +1,4 @@
 [submodule "core-abi"]
 	path = core-abi
 	url = https://github.com/AnvoIO/core-abi.git
-	branch = rebrand/core-abi
+	branch = main

@@ -1,6 +1,6 @@
 {
   "name": "@anvoio/node-core-abi",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0",
   "publishConfig": {
     "access": "public",
     "tag": "latest"

@@ -3,7 +3,7 @@
     "dev": "deno run --watch main.ts"
   },
   "imports": {
-    "@anvoio/node-core-abi": "npm:@anvoio/node-core-abi@^1.0.0-alpha.1",
+    "@anvoio/node-core-abi": "npm:@anvoio/node-core-abi@^1.0.0",
     "@std/assert": "jsr:@std/assert@1"
   },
   "nodeModulesDir": "auto"
